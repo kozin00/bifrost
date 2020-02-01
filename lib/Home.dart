@@ -26,9 +26,9 @@ class _HomePageState extends State<HomePage> {
 
   bool _searchSelected = false;
 
-  int _screen=1;
+  int _screen = 1;
 
-
+  GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey();
 
   @override
   void initState() {
@@ -191,7 +191,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget body() {
-    switch(_screen){
+    switch (_screen) {
       case 0:
         break;
       case 1:
@@ -202,7 +202,6 @@ class _HomePageState extends State<HomePage> {
         break;
       case 4:
         break;
-
     }
   }
 
@@ -246,7 +245,7 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
               backgroundColor: primaryColor,
               icon: Icon(
-                Icons.account_circle,
+                Icons.menu,
                 size: 35.0,
                 color: _selectedItem == bottomIcons.profile ? active : inactive,
               ),
@@ -262,7 +261,7 @@ class _HomePageState extends State<HomePage> {
               case 0:
                 _selectedItem = bottomIcons.post;
                 _data = "Post";
-                _screen=0;
+                _screen = 0;
                 _showAppbar = true;
                 _searchSelected = false;
                 isScrollingDown = false;
@@ -271,7 +270,7 @@ class _HomePageState extends State<HomePage> {
               case 1:
                 _selectedItem = bottomIcons.home;
                 _data = "Home";
-                _screen=1;
+                _screen = 1;
                 _showAppbar = true;
                 _searchSelected = false;
                 isScrollingDown = false;
@@ -279,25 +278,24 @@ class _HomePageState extends State<HomePage> {
               case 2:
                 _selectedItem = bottomIcons.study;
                 _data = "Create Study Group";
-                _screen=2;
+                _screen = 2;
                 _showAppbar = true;
                 _searchSelected = false;
                 isScrollingDown = false;
                 break;
               case 3:
                 _selectedItem = bottomIcons.search;
-                _screen=3;
+                _screen = 3;
                 _searchSelected = true;
                 _showAppbar = true;
                 isScrollingDown = false;
                 break;
               case 4:
                 _selectedItem = bottomIcons.profile;
-                _screen=4;
-                _data = "Account";
                 _showAppbar = true;
                 _searchSelected = false;
                 isScrollingDown = false;
+                _scaffoldkey.currentState.openEndDrawer();
                 break;
             }
           });
@@ -310,6 +308,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     //SystemChrome.setEnabledSystemUIOverlays([]);
     return Scaffold(
+      key: _scaffoldkey,
       resizeToAvoidBottomPadding: false,
       appBar: _showAppbar
           ? _AppBar()
@@ -318,54 +317,69 @@ class _HomePageState extends State<HomePage> {
               preferredSize: Size(0.0, 0.0),
             ),
       body: body(),
-     drawer: Drawer(
+      endDrawer: (_selectedItem == bottomIcons.profile)
+          ? Drawer(
+              child: Padding(
+                padding: const EdgeInsets.all(0.0),
+                child: ListView(
+                  children: <Widget>[
+                    InkWell(
+                      child: ListTile(
+                        title: Text("Account"),
+                        leading: Icon(Icons.account_circle),
+                      ),
+                      onTap: () {},
+                    ),
+                    Divider(),
+                    InkWell(
+                      child: ListTile(
+                        title: Text("Study Groups"),
+                        leading: Icon(Icons.group_add),
+                      ),
+                      onTap: () {},
+                    ),
+                    Divider(),
+                    InkWell(
+                      child: ListTile(
+                        title: Text("Mentors"),
+                        leading: Icon(Icons.person),
+                        onTap: () {},
+                      ),
+                    ),
+                    Divider(),
+                    InkWell(
+                      child: ListTile(
+                        title: Text("Backtests"),
+                        leading: Icon(Icons.library_books),
+                      ),
+                    ),
+                    Divider(),
+                    InkWell(
+                      child: ListTile(
+                        title: Text("Settings"),
+                        leading: Icon(Icons.settings, color: Colors.blue,),
+                      ),
+                    ),
+                    Divider(),
+                    SizedBox(
+                      height: 370,
+                    ),
 
-        child: Padding(
-          padding: const EdgeInsets.all(0.0),
-          child: ListView(
-            children: <Widget>[
+                    InkWell(
+                      onTap: () {},
+                      child: ListTile(
+                        title: Text("Log out"),
+                        leading: Icon(
+                          Icons.transit_enterexit,
+                          color: Colors.purple,
+                        ),
+                      ),
+                    ),
 
-              Divider(),
-              InkWell(
-                child: ListTile(
-                  title: Text("Study Groups"),
-                  leading: Icon(Icons.group_add),
-                ),
-                onTap: () {},
-              ),
-              Divider(),
-              InkWell(
-                child: ListTile(
-                  title: Text("Mentors"),
-                  leading: Icon(Icons.person),
-                  onTap: () {},
+                  ],
                 ),
               ),
-              Divider(),
-              InkWell(
-                child: ListTile(
-                  title: Text("Backtests"),
-                  leading: Icon(Icons.library_books),
-                ),
-              ),
-              Divider(),
-              InkWell(
-                onTap: () {
-
-                },
-                child: ListTile(
-                  title: Text("Log out"),
-                  leading: Icon(
-                    Icons.transit_enterexit,
-                    color: Colors.purple,
-                  ),
-                ),
-              ),
-              Divider()
-            ],
-          ),
-        ),
-      ),
+            ): PreferredSize(preferredSize: Size(0,0),),
       bottomNavigationBar: navigationBar(),
     );
   }
