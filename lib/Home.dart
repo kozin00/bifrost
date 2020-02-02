@@ -16,7 +16,7 @@ class _HomePageState extends State<HomePage> {
   bottomIcons _selectedItem = bottomIcons.home;
   String _data = "Home";
   Color primaryColor = Colors.purpleAccent[200];
-  Color active = Colors.purple[400];
+  Color active = Color(0xFFF038FF);
   Color inactive = Colors.purple[700];
 
   ScrollController _scrollAppBarControllerHome = new ScrollController();
@@ -212,42 +212,57 @@ class _HomePageState extends State<HomePage> {
         items: [
           BottomNavigationBarItem(
               backgroundColor: primaryColor,
-              icon: Icon(
-                Icons.chat_bubble,
-                size: 30.0,
-                color: _selectedItem == bottomIcons.post ? active : inactive,
+              icon: Padding(
+                padding: const EdgeInsets.only(top: 10.0),
+                child: Icon(
+                  Icons.chat_bubble,
+                  size: 30.0,
+                  color: _selectedItem == bottomIcons.post ? active : inactive,
+                ),
               ),
               title: Text('')),
           BottomNavigationBarItem(
               backgroundColor: primaryColor,
-              icon: Icon(
-                Icons.home,
-                size: 35.0,
-                color: _selectedItem == bottomIcons.home ? active : inactive,
+              icon: Padding(
+                padding: const EdgeInsets.only(top: 10.0),
+                child: Icon(
+                  Icons.home,
+                  size: 30.0,
+                  color: _selectedItem == bottomIcons.home ? active : inactive,
+                ),
               ),
               title: Text('')),
           BottomNavigationBarItem(
               backgroundColor: primaryColor,
-              icon: Icon(
-                Icons.group,
-                size: 35.0,
-                color: _selectedItem == bottomIcons.study ? active : inactive,
+              icon: Padding(
+                padding: const EdgeInsets.only(top: 10.0),
+                child: Icon(
+                  Icons.group,
+                  size: 30.0,
+                  color: _selectedItem == bottomIcons.study ? active : inactive,
+                ),
               ),
               title: Text('')),
           BottomNavigationBarItem(
               backgroundColor: primaryColor,
-              icon: Icon(
-                Icons.search,
-                size: 35.0,
-                color: _selectedItem == bottomIcons.search ? active : inactive,
+              icon: Padding(
+                padding: const EdgeInsets.only(top: 10.0),
+                child: Icon(
+                  Icons.search,
+                  size: 30.0,
+                  color: _selectedItem == bottomIcons.search ? active : inactive,
+                ),
               ),
               title: Text('')),
           BottomNavigationBarItem(
               backgroundColor: primaryColor,
-              icon: Icon(
-                Icons.menu,
-                size: 35.0,
-                color: _selectedItem == bottomIcons.profile ? active : inactive,
+              icon: Padding(
+                padding: const EdgeInsets.only(top: 10.0),
+                child: Icon(
+                  Icons.menu,
+                  size: 30.0,
+                  color: _selectedItem == bottomIcons.profile ? active : inactive,
+                ),
               ),
               title: Text(''))
         ],
@@ -292,9 +307,6 @@ class _HomePageState extends State<HomePage> {
                 break;
               case 4:
                 _selectedItem = bottomIcons.profile;
-                _showAppbar = true;
-                _searchSelected = false;
-                isScrollingDown = false;
                 _scaffoldkey.currentState.openEndDrawer();
                 break;
             }
@@ -357,14 +369,16 @@ class _HomePageState extends State<HomePage> {
                     InkWell(
                       child: ListTile(
                         title: Text("Settings"),
-                        leading: Icon(Icons.settings, color: Colors.blue,),
+                        leading: Icon(
+                          Icons.settings,
+                          color: Colors.grey,
+                        ),
                       ),
                     ),
                     Divider(),
                     SizedBox(
                       height: 370,
                     ),
-
                     InkWell(
                       onTap: () {},
                       child: ListTile(
@@ -375,12 +389,14 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-
                   ],
                 ),
               ),
-            ): PreferredSize(preferredSize: Size(0,0),),
-      bottomNavigationBar: navigationBar(),
+            )
+          : PreferredSize(
+              preferredSize: Size(0, 0),
+            ),
+      bottomNavigationBar: SizedBox(height: 75,child: navigationBar()),
     );
   }
 }
