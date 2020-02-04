@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -14,6 +16,7 @@ class _HomePageState extends State<HomePage> {
   bool _showAppbar = true;
   bool isScrollingDown = false;
   bottomIcons _selectedItem = bottomIcons.home;
+
   String _data = "Home";
   Color primaryColor = Colors.purpleAccent[200];
   Color active = Color(0xFFF038FF);
@@ -29,6 +32,15 @@ class _HomePageState extends State<HomePage> {
   int _screen = 1;
 
   GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey();
+
+  List<Color> tagColors = [
+    Colors.red,
+    Colors.yellow,
+    Colors.green,
+    Colors.grey,
+    Colors.blue,
+    Colors.pink
+  ];
 
   @override
   void initState() {
@@ -131,6 +143,105 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  List<Post> posts = [
+    Post(
+        name: "Clark Kent",
+        type: "Study Group",
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, "
+            "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ",
+        tags: ["Journalism, Photography, Writing"]),
+    Post(
+        name: "Bruce Wayne",
+        type: "Mentor",
+        message: "Ut enim ad minim veniam,"
+            " quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat..... I'm Batman ",
+        tags: [
+          "Chemical Engineering, Mechanincal Engineering, Forensic Science, Crime-Fighting, Art of Deduction"
+        ]),
+    Post(
+        name: "Princess Diana",
+        type: "Study Group",
+        message: " Duis aute irure dolor in reprehenderit in voluptate velit "
+            "esse cillum dolore eu fugiat nulla pariatur. ",
+        tags: ["Royal Manners, Lie Detection"]),
+  ];
+
+  Widget _buildTags(List<String> tags) {
+    var rndcolor = new Random();
+    return ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) {
+          return Material(
+            child: Container(
+              child: Text(tags[index]),
+              color: tagColors[rndcolor.nextInt(tagColors.length)],
+            ),
+          );
+        });
+  }
+
+  Widget _buildPost(List<Post> posts) {
+    print("Opened function");
+    return ListView.builder(
+        itemCount: posts.length,
+        itemBuilder: (_, index) {
+          print("Opened");
+
+          return Column(
+            children: <Widget>[
+              Container(
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        CircleAvatar(
+                          backgroundColor: Colors.blue,
+                        ),
+                        Text(posts[index].name),
+                        Text("2d")
+                      ],
+                    ),
+                    _buildTags(posts[index].tags),
+                    Container(
+                      width: 100,
+                      child: Text(posts[index].message),
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Icon(
+                              Icons.comment,
+                              color: Colors.grey,
+                            ),
+                            Text("2")
+                          ],
+                        ),
+                        SizedBox(
+                          width: 50,
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Icon(
+                              Icons.favorite,
+                              color: Colors.red,
+                            ),
+                            Text("1.2K")
+                          ],
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+              Divider(
+                color: Colors.black12,
+              )
+            ],
+          );
+        });
+  }
+
   Widget _AppBar() {
     if (_searchSelected) {
       return PreferredSize(
@@ -193,8 +304,11 @@ class _HomePageState extends State<HomePage> {
   Widget body() {
     switch (_screen) {
       case 0:
+
         break;
       case 1:
+        return _buildPost(posts);
+
         break;
       case 2:
         break;
@@ -203,6 +317,7 @@ class _HomePageState extends State<HomePage> {
       case 4:
         break;
     }
+    return null;
   }
 
   Widget navigationBar() {
@@ -250,7 +365,8 @@ class _HomePageState extends State<HomePage> {
                 child: Icon(
                   Icons.search,
                   size: 30.0,
-                  color: _selectedItem == bottomIcons.search ? active : inactive,
+                  color:
+                      _selectedItem == bottomIcons.search ? active : inactive,
                 ),
               ),
               title: Text('')),
@@ -261,7 +377,8 @@ class _HomePageState extends State<HomePage> {
                 child: Icon(
                   Icons.menu,
                   size: 30.0,
-                  color: _selectedItem == bottomIcons.profile ? active : inactive,
+                  color:
+                      _selectedItem == bottomIcons.profile ? active : inactive,
                 ),
               ),
               title: Text(''))
@@ -396,7 +513,19 @@ class _HomePageState extends State<HomePage> {
           : PreferredSize(
               preferredSize: Size(0, 0),
             ),
-      bottomNavigationBar: SizedBox(height: 75,child: navigationBar()),
+      bottomNavigationBar: SizedBox(height: 75, child: navigationBar()),
     );
   }
+}
+
+
+
+class Post {
+  final String name;
+  final String image;
+  final String type;
+  final List<String> tags;
+  final String message;
+
+  Post({this.name, this.image, this.type, this.tags, this.message});
 }
