@@ -9,17 +9,6 @@ class _PostState extends State<Post> {
   String type = "Mentor";
   List<String> types = ["Mentor", "Study Group"];
   String tagName = "";
-  TextEditingController _tagname = new TextEditingController();
-  List<String> fields = [
-    "Math",
-    "Engineering",
-    "Science",
-    "Business & Management",
-    "HASS",
-    "Architecture",
-    "Custom"
-  ];
-  String fieldsValue;
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +17,7 @@ class _PostState extends State<Post> {
         leading: IconButton(
           icon: Icon(Icons.close),
           onPressed: () {
+            selectedTagsList.clear();
             Navigator.pop(context);
           },
         ),
@@ -99,13 +89,19 @@ class _PostState extends State<Post> {
   Padding selectTags() {
     return Padding(
       padding: const EdgeInsets.only(left: 15.0),
-      child: Row(
+      child: Column(
         children: <Widget>[
-          Text(
-            'Tags:',
-            style: TextStyle(fontSize: 20),
+          Row(
+            children: <Widget>[
+              Text(
+                'Tags:',
+                style: TextStyle(fontSize: 20),
+              ),
+              (selectedTagsList.length == 0)
+                  ? Container()
+                  : Container(height: 35, width: 400, child: _showTags()),
+            ],
           ),
-          Container(height: 200, width: 200, child: _showTags()),
           IconButton(
             icon: Icon(
               Icons.add,
@@ -113,7 +109,6 @@ class _PostState extends State<Post> {
             ),
             onPressed: () {
               addTag();
-              Navigator.of(context).pop();
             },
           )
         ],
@@ -144,7 +139,7 @@ class _PostState extends State<Post> {
               ),
               SizedBox(
                 width: 15,
-              )
+              ),
             ],
           );
         });
@@ -155,18 +150,86 @@ class _PostState extends State<Post> {
       content: Container(
         width: 300,
         height: 300,
-        child: tagList(),
+        child: TagList(),
       ),
     );
     showDialog(context: context, builder: (_) => alert);
   }
+}
 
-  Widget tagList() {
-    fieldsValue = fields[0];
-    return ListView(
+void _addToTags(String name, String field) {
+  Color _tagColor;
+  switch (field) {
+    case "Math":
+      _tagColor = Colors.red;
+      break;
+    case "Science":
+      _tagColor = Colors.green;
+      break;
+    case "Engineering":
+      _tagColor = Colors.blue[900];
+      break;
+    case "HASS":
+      _tagColor = Colors.orange;
+      break;
+    case "Architecture":
+      _tagColor = Colors.yellowAccent;
+      break;
+    case "Business & Management":
+      _tagColor = Colors.pink;
+      break;
+    default:
+      _tagColor = Colors.grey;
+      break;
+  }
+
+  selectedTagsList.add(Tags(name: name, color: _tagColor));
+}
+
+class TagList extends StatefulWidget {
+  @override
+  _TagListState createState() => _TagListState();
+}
+
+class _TagListState extends State<TagList> {
+  List<String> fields = [
+    "Math",
+    "Engineering",
+    "Science",
+    "Business",
+    "HASS",
+    "Architecture",
+    "Custom"
+  ];
+  String fieldsValue;
+
+  final _formKey = new GlobalKey<FormState>();
+  TextEditingController _tagName = new TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
       children: <Widget>[
-        TextFormField(
-          controller: _tagname,
+        Form(
+          key: _formKey,
+          child: Material(
+            borderRadius: BorderRadius.circular(10.0),
+            color: Colors.white.withOpacity(0.8),
+            elevation: 0.0,
+            child: TextFormField(
+                decoration:
+                    InputDecoration(hintText: "Name", border: InputBorder.none),
+                controller: _tagName,
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return "The name field cannot be empty";
+                  }
+                  if (value.length > 15) {
+                    return "The name field cannot be longer than 15 characters";
+                  }
+                  return null;
+                }),
+          ),
         ),
         Row(
           children: <Widget>[
@@ -209,7 +272,11 @@ class _PostState extends State<Post> {
               color: Color(0xFFAF2BBF),
               child: MaterialButton(
                 onPressed: () {
-                  _addToTags(_tagname.text, fieldsValue);
+                  FormState _formState = _formKey.currentState;
+                  if (_formState.validate()) {
+                    _addToTags(_tagName.text, fieldsValue);
+                    Navigator.of(context).pop();
+                  }
                 },
                 child: Text(
                   "Add",
@@ -221,37 +288,6 @@ class _PostState extends State<Post> {
         )
       ],
     );
-  }
-
-  void _addToTags(String name, String field) {
-    Color _tagColor;
-    switch (field) {
-      case "Math":
-        _tagColor = Colors.red;
-        break;
-      case "Science":
-        _tagColor = Colors.green;
-        break;
-      case "Engineering":
-        _tagColor = Colors.blue[900];
-        break;
-      case "HASS":
-        _tagColor = Colors.orange;
-        break;
-      case "Architecture":
-        _tagColor = Colors.yellowAccent;
-        break;
-      case "Business & Management":
-        _tagColor = Colors.pink;
-        break;
-      default:
-        _tagColor = Colors.grey;
-        break;
-    }
-
-    setState(() {
-      selectedTagsList.add(Tags(name: name, color: _tagColor));
-    });
   }
 }
 
