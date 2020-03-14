@@ -1,4 +1,4 @@
-import 'package:bifrost/Home.dart';
+import 'package:bifrost/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

@@ -1,34 +1,32 @@
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
+import 'package:bifrost/post.dart' as post;
 
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-enum bottomIcons { post, study, home, search, profile }
-
 class _HomePageState extends State<HomePage> {
-  var current = 0;
+
   bool _showAppbar = true;
   bool isScrollingDown = false;
-  bottomIcons _selectedItem = bottomIcons.home;
+  bool _profileSelected = false;
+  bool _searchSelected = false;
 
   String _data = "Home";
-  Color primaryColor = Colors.purpleAccent[200];
-  Color active = Color(0xFFAF2BBF);
 
-  Color inactive = Colors.purple[700];
+  //Color active = Color(0xFFAF2BBF);
+
+  Color iconColor = Colors.purple[700];
 
   ScrollController _scrollAppBarControllerHome = new ScrollController();
   ScrollController _scrollAppBarControllerProducts = new ScrollController();
   ScrollController _scrollAppBarControllerMessages = new ScrollController();
   ScrollController _scrollAppBarControllerFavourites = new ScrollController();
-
-  bool _searchSelected = false;
 
   int _screen = 1;
 
@@ -202,15 +200,17 @@ class _HomePageState extends State<HomePage> {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: <Color>[
-                            tagColors[index % tagColors.length],
-                            tagColors[index % tagColors.length]
+                        tagColors[index % tagColors.length],
+                        tagColors[index % tagColors.length]
                       ])),
                   height: 35,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(outputList[index],style: TextStyle(color: Colors.white),),
+                    child: Text(
+                      outputList[index],
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
-
                 ),
               ),
               SizedBox(
@@ -382,18 +382,12 @@ class _HomePageState extends State<HomePage> {
 
   Widget body() {
     switch (_screen) {
-      case 0:
-        break;
       case 1:
         return _buildPost(posts);
-
         break;
       case 2:
-        print(posts[0].tags);
         break;
       case 3:
-        break;
-      case 4:
         break;
     }
     return null;
@@ -405,104 +399,92 @@ class _HomePageState extends State<HomePage> {
       child: BottomNavigationBar(
         items: [
           BottomNavigationBarItem(
-              backgroundColor: primaryColor,
               icon: Padding(
                 padding: const EdgeInsets.only(top: 10.0),
                 child: Icon(
                   Icons.chat_bubble,
                   size: 30.0,
-                  color: _selectedItem == bottomIcons.post ? active : inactive,
+                  color: iconColor,
                 ),
               ),
               title: Text('')),
           BottomNavigationBarItem(
-              backgroundColor: primaryColor,
               icon: Padding(
                 padding: const EdgeInsets.only(top: 10.0),
                 child: Icon(
                   Icons.home,
                   size: 30.0,
-                  color: _selectedItem == bottomIcons.home ? active : inactive,
+                  color: iconColor,
                 ),
               ),
               title: Text('')),
           BottomNavigationBarItem(
-              backgroundColor: primaryColor,
               icon: Padding(
                 padding: const EdgeInsets.only(top: 10.0),
                 child: Icon(
                   Icons.group,
                   size: 30.0,
-                  color: _selectedItem == bottomIcons.study ? active : inactive,
+                  color: iconColor,
                 ),
               ),
               title: Text('')),
           BottomNavigationBarItem(
-              backgroundColor: primaryColor,
               icon: Padding(
                 padding: const EdgeInsets.only(top: 10.0),
                 child: Icon(
                   Icons.search,
                   size: 30.0,
-                  color:
-                      _selectedItem == bottomIcons.search ? active : inactive,
+                  color: iconColor,
                 ),
               ),
               title: Text('')),
           BottomNavigationBarItem(
-              backgroundColor: primaryColor,
               icon: Padding(
                 padding: const EdgeInsets.only(top: 10.0),
                 child: Icon(
                   Icons.menu,
                   size: 30.0,
-                  color:
-                      _selectedItem == bottomIcons.profile ? active : inactive,
+                  color: iconColor,
                 ),
               ),
               title: Text(''))
         ],
-        currentIndex: current,
+        currentIndex: 0,
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
         onTap: (index) {
           setState(() {
-            current = index;
+            int current = index;
             switch (current) {
               case 0:
-                _selectedItem = bottomIcons.post;
-                _data = "Post";
-                _screen = 0;
-                _showAppbar = true;
-                _searchSelected = false;
-                isScrollingDown = false;
-
+                Navigator.push(context,
+                    CupertinoPageRoute(builder: (context) => post.Post()));
                 break;
               case 1:
-                _selectedItem = bottomIcons.home;
                 _data = "Home";
                 _screen = 1;
+                _profileSelected=false;
                 _showAppbar = true;
                 _searchSelected = false;
                 isScrollingDown = false;
                 break;
               case 2:
-                _selectedItem = bottomIcons.study;
                 _data = "Create Study Group";
                 _screen = 2;
+                _profileSelected=false;
                 _showAppbar = true;
                 _searchSelected = false;
                 isScrollingDown = false;
                 break;
               case 3:
-                _selectedItem = bottomIcons.search;
                 _screen = 3;
+                _profileSelected=false;
                 _searchSelected = true;
                 _showAppbar = true;
                 isScrollingDown = false;
                 break;
               case 4:
-                _selectedItem = bottomIcons.profile;
+                _profileSelected=true;
                 _scaffoldkey.currentState.openEndDrawer();
                 break;
             }
@@ -526,7 +508,7 @@ class _HomePageState extends State<HomePage> {
               preferredSize: Size(0.0, 0.0),
             ),
       body: body(),
-      endDrawer: (_selectedItem == bottomIcons.profile)
+      endDrawer: (_profileSelected)
           ? Drawer(
               child: Column(
                 children: <Widget>[
