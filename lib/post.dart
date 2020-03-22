@@ -25,6 +25,8 @@ class _PostState extends State<Post> {
   final _formKey = new GlobalKey<FormState>();
   TextEditingController _tagName = new TextEditingController();
 
+  String selectedGroup = " ";
+
   @override
   void initState() {
     super.initState();
@@ -124,7 +126,7 @@ class _PostState extends State<Post> {
                       padding: const EdgeInsets.only(left: 10.0),
                       child: Container(
                           height: 35,
-                          width: (selectedTagsList.length * 100).toDouble(),
+                          width: (selectedTagsList.length * 130).toDouble(),
                           child: _showTags()),
                     ),
               IconButton(
@@ -133,18 +135,14 @@ class _PostState extends State<Post> {
                   color: Color(0xFFAF2BBF),
                 ),
                 onPressed: () {
-                  if (selectedTagsList.length >= 2) {
-                    setState(() {
-                      maxTags = true;
-                    });
-                  } else {
+                  if (selectedTagsList.length < 2) {
                     addTag();
                   }
                 },
               )
             ],
           ),
-          (maxTags)
+          (selectedTagsList.length >= 2)
               ? Align(
                   alignment: Alignment.centerLeft,
                   child: Container(
@@ -167,7 +165,7 @@ class _PostState extends State<Post> {
           return StatefulBuilder(
             builder: (context, setState) {
               return AlertDialog(
-                content: Text("Remove $name from product list?"),
+                content: Text("Remove $name from tags?"),
                 actions: <Widget>[
                   FlatButton(
                     onPressed: () {
@@ -175,13 +173,13 @@ class _PostState extends State<Post> {
                         selectedTagsList.removeAt(index);
                       });
 
-                      Navigator.pop(context);
+                      Navigator.of(context).pop();
                     },
                     child: Text("Yes"),
                   ),
                   FlatButton(
                     onPressed: () {
-                      Navigator.pop(context);
+                      Navigator.of(context).pop();
                     },
                     child: Text("No"),
                   )
@@ -208,7 +206,7 @@ class _PostState extends State<Post> {
                   child: Container(
                     color: selectedTagsList[index].color,
                     height: 35,
-                    width: 85,
+                    width: 115,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
@@ -257,7 +255,7 @@ class _PostState extends State<Post> {
                                 return "The name field cannot be empty";
                               }
                               if (value.length > 15) {
-                                return "The name cannot have more than 15 characters";
+                                return "The name cannot have more than 14 characters";
                               } else {
                                 if (value.length < 2) {
                                   return "The name must have more than 2 characters";
@@ -338,6 +336,68 @@ class _PostState extends State<Post> {
         });
   }
 
+  Padding _attachLink() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 15.0),
+      child: Column(
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Text(
+                'Attach Group Link:',
+                style: TextStyle(fontSize: 20),
+              ),
+              (myGroups.length == 0 || selectedGroup == " ")
+                  ? IconButton(
+                      icon: Icon(
+                        Icons.add,
+                        color: Color(0xFFAF2BBF),
+                      ),
+                      onPressed: () {
+                        addLink();
+                      },
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.only(left: 10.0),
+                      child: Container(height: 35, child: Text(selectedGroup)),
+                    ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void addLink() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+              return Container(
+                  width: 300,
+                  height: 300,
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        child: ListView.builder(
+                            itemCount: myGroups.length,
+                            itemBuilder: (context, index) {
+                              return Radio();
+                            }),
+                      ),
+                      FlatButton(
+                        color: Colors.purple,
+                        child: Text("Create Group"),
+                      )
+                    ],
+                  ));
+            }),
+          );
+        });
+  }
+
   Color addToTags(String field) {
     Color _tagColor;
     switch (field) {
@@ -369,10 +429,18 @@ class _PostState extends State<Post> {
 }
 
 List<Tags> selectedTagsList = [];
+List<Groups> myGroups = [];
 
 class Tags {
   final String name;
   final Color color;
 
   Tags({this.name, this.color});
+}
+
+class Groups {
+  final String name;
+  final String link;
+
+  Groups({this.name, this.link});
 }
