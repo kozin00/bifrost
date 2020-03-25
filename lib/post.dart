@@ -1,5 +1,7 @@
+import 'package:bifrost/tagColor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class Post extends StatefulWidget {
   @override
@@ -24,8 +26,7 @@ class _PostState extends State<Post> {
   bool dialog = false;
   final _formKey = new GlobalKey<FormState>();
   TextEditingController _tagName = new TextEditingController();
-
-  String selectedGroup = " ";
+  Groups _selectedGroup = new Groups(name: "", link: "");
 
   @override
   void initState() {
@@ -62,13 +63,24 @@ class _PostState extends State<Post> {
           )
         ],
       ),
-      body: Body(),
+      body: body(),
     );
   }
 
-  ListView Body() {
+  ListView body() {
     return ListView(
-      children: <Widget>[selectType(), selectTags()],
+      children: <Widget>[
+        selectType(),
+        selectTags(),
+        attachLink(),
+        Padding(
+          padding: const EdgeInsets.only(top: 15.0, left: 15.0, right: 15.0),
+          child: Divider(color: Colors.black54),
+        ),
+        mainContent(),
+        options(),
+
+      ],
     );
   }
 
@@ -137,12 +149,16 @@ class _PostState extends State<Post> {
                 onPressed: () {
                   if (selectedTagsList.length < 2) {
                     addTag();
+                  } else {
+                    setState(() {
+                      maxTags = true;
+                    });
                   }
                 },
               )
             ],
           ),
-          (selectedTagsList.length >= 2)
+          (maxTags)
               ? Align(
                   alignment: Alignment.centerLeft,
                   child: Container(
@@ -158,19 +174,23 @@ class _PostState extends State<Post> {
     );
   }
 
-  void _removeTag(int index, String name) {
+  void _remove(int index, String name, int type) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return StatefulBuilder(
             builder: (context, setState) {
               return AlertDialog(
-                content: Text("Remove $name from tags?"),
+                content: (type == 0)
+                    ? Text("Remove $name from tags?")
+                    : Text("Remove $name group?"),
                 actions: <Widget>[
                   FlatButton(
                     onPressed: () {
                       setState(() {
-                        selectedTagsList.removeAt(index);
+                        (type == 0)
+                            ? selectedTagsList.removeAt(index)
+                            : _selectedGroup = Groups(name: "", link: "");
                       });
 
                       Navigator.of(context).pop();
@@ -199,7 +219,12 @@ class _PostState extends State<Post> {
             children: <Widget>[
               InkWell(
                 onTap: () {
-                  _removeTag(index, selectedTagsList[index].name);
+                  setState(() {
+                    _remove(index, selectedTagsList[index].name, 0);
+                    if (maxTags) {
+                      maxTags = !maxTags;
+                    }
+                  });
                 },
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(30),
@@ -310,7 +335,7 @@ class _PostState extends State<Post> {
                             onPressed: () {
                               FormState _formState = _formKey.currentState;
                               if (_formState.validate()) {
-                                Color _tagColor = addToTags(fieldValue);
+                                Color _tagColor = subTagsColor(fieldValue);
                                 setState(() {
                                   selectedTagsList.add(Tags(
                                       name: _tagName.text, color: _tagColor));
@@ -336,7 +361,7 @@ class _PostState extends State<Post> {
         });
   }
 
-  Padding _attachLink() {
+  Padding attachLink() {
     return Padding(
       padding: const EdgeInsets.only(left: 15.0),
       child: Column(
@@ -345,22 +370,31 @@ class _PostState extends State<Post> {
             children: <Widget>[
               Text(
                 'Attach Group Link:',
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(fontSize: 18),
               ),
-              (myGroups.length == 0 || selectedGroup == " ")
+              (myGroups.length == 0 || _selectedGroup.name == "")
                   ? IconButton(
                       icon: Icon(
-                        Icons.add,
+                        Icons.link,
                         color: Color(0xFFAF2BBF),
                       ),
                       onPressed: () {
                         addLink();
                       },
                     )
-                  : Padding(
-                      padding: const EdgeInsets.only(left: 10.0),
-                      child: Container(height: 35, child: Text(selectedGroup)),
-                    ),
+                  : Container(
+                      height: 35,
+                      child: InkWell(
+                          onTap: () {
+                            _remove(0, _selectedGroup.name, 1);
+                          },
+                          child: Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 10.0, left: 10.0, right: 10.0),
+                              child: Text(
+                                _selectedGroup.name,
+                                style: TextStyle(fontSize: 15),
+                              )))),
             ],
           ),
         ],
@@ -369,6 +403,10 @@ class _PostState extends State<Post> {
   }
 
   void addLink() {
+    String selectedGroup;
+    if (myGroups.length > 0) {
+      selectedGroup = myGroups[0].name;
+    }
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -377,20 +415,48 @@ class _PostState extends State<Post> {
                 builder: (BuildContext context, StateSetter setState) {
               return Container(
                   width: 300,
-                  height: 300,
+                  height: (myGroups.length == 0)
+                      ? 100
+                      : (60 * (myGroups.length.toDouble())) + 76.0,
                   child: Column(
                     children: <Widget>[
-                      Container(
-                        child: ListView.builder(
-                            itemCount: myGroups.length,
-                            itemBuilder: (context, index) {
-                              return Radio();
-                            }),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0, bottom: 20.0),
+                        child: (myGroups.length == 0)
+                            ? Container(
+                                child: Text("You have no groups."),
+                              )
+                            : Container(
+                                width: MediaQuery.of(context).size.width,
+                                height: 60 * myGroups.length.toDouble(),
+                                child: ListView.builder(
+                                    itemCount: myGroups.length,
+                                    itemBuilder: (context, index) {
+                                      return ListTile(
+                                        title: Text(myGroups[index].name),
+                                        trailing: Radio(
+                                          value: myGroups[index].name,
+                                          groupValue: selectedGroup,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              selectedGroup = value;
+                                              _selectedGroup = myGroups[index];
+                                            });
+                                          },
+                                        ),
+                                      );
+                                    })),
                       ),
-                      FlatButton(
-                        color: Colors.purple,
-                        child: Text("Create Group"),
-                      )
+                      Material(
+                        color: Color(0xFFAF2BBF),
+                        child: MaterialButton(
+                          onPressed: () {},
+                          child: Text(
+                            "Create New Group",
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                        ),
+                      ),
                     ],
                   ));
             }),
@@ -398,38 +464,46 @@ class _PostState extends State<Post> {
         });
   }
 
-  Color addToTags(String field) {
-    Color _tagColor;
-    switch (field) {
-      case "Mathematics":
-        _tagColor = Colors.red;
-        break;
-      case "Science":
-        _tagColor = Colors.green;
-        break;
-      case "Engineering":
-        _tagColor = Colors.blue[900];
-        break;
-      case "HASS":
-        _tagColor = Colors.orange;
-        break;
-      case "Architecture":
-        _tagColor = Colors.yellowAccent;
-        break;
-      case "Business & MGMT":
-        _tagColor = Colors.pink;
-        break;
-      default:
-        _tagColor = Colors.grey;
-        break;
-    }
-
-    return _tagColor;
+  Padding mainContent() {
+    return Padding(
+      padding: const EdgeInsets.all(15.0),
+      child: TextField(
+        maxLines: 8,
+        decoration: InputDecoration(hintText: "Enter your text here"),
+      ),
+    );
   }
+
+  Row options() {
+    return Row(
+      children: <Widget>[
+        IconButton(
+          icon: Icon(
+            Icons.location_on,
+            color: Color(0xFFAF2BBF),
+            size: 25.0,
+          ),
+        ),
+        IconButton(
+          icon: Icon(
+            Icons.photo,
+            color: Color(0xFFAF2BBF),
+            size: 25.0,
+          ),
+        )
+      ],
+    );
+  }
+
+
 }
 
 List<Tags> selectedTagsList = [];
-List<Groups> myGroups = [];
+List<Groups> myGroups = [
+  Groups(name: "Engineering", link: "Engineering"),
+  Groups(name: "Science Mentor", link: "Science Group"),
+  Groups(name: "Calculus II", link: "Calculus II"),
+];
 
 class Tags {
   final String name;

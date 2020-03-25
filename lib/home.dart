@@ -1,8 +1,12 @@
-import 'dart:math';
-
+import 'package:bifrost/Tags.dart';
+import 'package:bifrost/messages.dart';
+import 'package:bifrost/postDetails.dart';
+import 'package:bifrost/tagColor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+
+import 'package:tuple/tuple.dart';
 import 'package:bifrost/post.dart' as post;
 
 class HomePage extends StatefulWidget {
@@ -11,7 +15,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   bool _showAppbar = true;
   bool isScrollingDown = false;
   bool _profileSelected = false;
@@ -22,7 +25,7 @@ class _HomePageState extends State<HomePage> {
   //Color active = Color(0xFFAF2BBF);
 
   Color iconColor = Colors.purple[700];
-
+  Color secondPurple = Color(0xFFAF2BBF);
   ScrollController _scrollAppBarControllerHome = new ScrollController();
   ScrollController _scrollAppBarControllerProducts = new ScrollController();
   ScrollController _scrollAppBarControllerMessages = new ScrollController();
@@ -144,46 +147,74 @@ class _HomePageState extends State<HomePage> {
   List<Post> posts = [
     Post(
         name: "Clark Kent",
-        type: "Study Group",
+        type: Tags("", "Study Group"),
         message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, "
             "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ",
-        tags: ["Journalism", "Photography", "Writing"]),
+        tags: [
+          Tags("HASS", "Journalism"),
+          Tags("HASS", "Photography"),
+          Tags("HASS", "Writing")
+        ]),
     Post(
         name: "Bruce Wayne",
-        type: "Mentor",
+        type: Tags("", "Mentor"),
         message: "Ut enim ad minim veniam,"
             " quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat..... I'm Batman ",
         tags: [
-          "Chemical Engineering",
-          "Mechanincal Engineering",
-          "Forensic Science",
-          "Crime-Fighting",
-          "Art of Deduction"
+          Tags("Engineering", "Chemical Engineering"),
+          Tags(
+            "Engineering",
+            "Mechanincal Engineering",
+          ),
+          Tags(
+            "Science",
+            "Forensic Science",
+          ),
+          Tags(
+            "Architecture",
+            "Crime-Fighting",
+          ),
+          Tags("HASS", "Crime-Fighting")
         ]),
     Post(
         name: "Barry Allen",
-        type: "Study Group",
+        type: Tags("", "Study Group"),
         message: " Duis aute irure dolor in reprehenderit in voluptate velit "
             "esse cillum dolore eu fugiat nulla pariatur. ",
-        tags: ["Running", "Forensic Science", "Computer Science"]),
+        tags: [
+          Tags("Custom", "Sports"),
+          Tags(
+            "Science",
+            "Forensic Science",
+          ),
+          Tags('Science', "Computer Science")
+        ]),
     Post(
         name: "Jon Jonzz",
-        type: "Mentor",
+        type: Tags("", "Mentor"),
         message: " Duis aute irure dolor in reprehenderit in voluptate velit "
             "esse cillum dolore eu fugiat nulla pariatur. ",
-        tags: ["Telepathy", "Telekinesis", "Psionics"]),
+        tags: [
+          Tags("Science", "Telepathy"),
+          Tags(
+            "Science",
+            "Telekinesis",
+          ),
+          Tags('Science', "Psionics")
+        ]),
     Post(
         name: "Shayera",
-        type: "Study Group",
+        type: Tags("", "Mentor"),
         message: " Duis aute irure dolor in reprehenderit in voluptate velit "
             "esse cillum dolore eu fugiat nulla pariatur. ",
-        tags: ["Aerodynamics", "Being baddass"]),
+        tags: [
+          Tags("Engineering", "Aerodynamics"),
+          Tags("Science", "Biology")
+        ]),
   ];
 
-  Widget _buildTags(String type, List<String> tags) {
-    var rndcolor = new Random();
-    tagColors.shuffle();
-    List<String> outputList = List<String>();
+  Widget _buildTags(Tags type, List<Tags> tags) {
+    List<Tags> outputList = List<Tags>();
     outputList.add(type);
     outputList.addAll(tags);
     return ListView.builder(
@@ -195,19 +226,14 @@ class _HomePageState extends State<HomePage> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(30),
                 child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: <Color>[
-                        tagColors[index % tagColors.length],
-                        tagColors[index % tagColors.length]
-                      ])),
+                  color: (index == 0)
+                      ? primaryTagsColor(outputList[index].second)
+                      : subTagsColor(outputList[index].first),
                   height: 35,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      outputList[index],
+                      outputList[index].second,
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -227,127 +253,115 @@ class _HomePageState extends State<HomePage> {
         itemBuilder: (_, index) {
           return Padding(
             padding: const EdgeInsets.only(top: 8.0, left: 12.0, right: 20.0),
-            child: Column(
-              children: <Widget>[
-                Container(
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        child: Row(
+            child: InkWell(
+              onTap: () {
+                Navigator.push(context, CupertinoPageRoute(builder: (context) {
+                  return PostDetails(
+                    name: posts[index].name,
+                    image: posts[index].image,
+                    post: posts[index].message,
+                    tags: posts[index].tags,
+                    type: posts[index].type,
+                  );
+                }));
+              },
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          child: Row(
+                            children: <Widget>[
+                              CircleAvatar(
+                                backgroundColor: Colors.purple,
+                              ),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              Text(
+                                posts[index].name,
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(
+                                width: 50,
+                              ),
+                              Text(
+                                "2d",
+                                textAlign: TextAlign.right,
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                            height: 40,
+                            child: _buildTags(
+                                posts[index].type, posts[index].tags)),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Container(
+                          width: 400,
+                          child: Text(
+                            posts[index].message,
+                            textAlign: TextAlign.left,
+                            style: TextStyle(fontSize: 17.0),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Row(
                           children: <Widget>[
-                            CircleAvatar(
-                              backgroundColor: Colors.purple,
-                            ),
-                            SizedBox(
-                              width: 20,
-                            ),
-                            Text(
-                              posts[index].name,
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            Row(
+                              children: <Widget>[
+                                Icon(
+                                  Icons.comment,
+                                  color: Colors.grey,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 5.0),
+                                  child: Text("2"),
+                                )
+                              ],
                             ),
                             SizedBox(
                               width: 50,
                             ),
-                            Text(
-                              "2d",
-                              textAlign: TextAlign.right,
-                            )
+                            Row(
+                              children: <Widget>[
+                                Icon(
+                                  Icons.favorite,
+                                  color: Colors.red,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 5.0),
+                                  child: Text("1.2K"),
+                                )
+                              ],
+                            ),
                           ],
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Container(
-                          height: 40,
-                          child:
-                              _buildTags(posts[index].type, posts[index].tags)),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Container(
-                        width: 400,
-                        child: Text(
-                          posts[index].message,
-                          textAlign: TextAlign.left,
-                          style: TextStyle(fontSize: 17.0),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              Icon(
-                                Icons.comment,
-                                color: Colors.grey,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 5.0),
-                                child: Text("2"),
-                              )
-                            ],
-                          ),
-                          SizedBox(
-                            width: 50,
-                          ),
-                          Row(
-                            children: <Widget>[
-                              Icon(
-                                Icons.favorite,
-                                color: Colors.red,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 5.0),
-                                child: Text("1.2K"),
-                              )
-                            ],
-                          ),
-                        ],
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
-                ),
-                Divider(
-                  color: Colors.black38,
-                )
-              ],
+                  Divider(
+                    color: Colors.black38,
+                  )
+                ],
+              ),
             ),
           );
         });
   }
 
-  Widget _AppBar() {
+  Widget _appBar() {
     if (_searchSelected) {
-      return PreferredSize(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 20.0),
-          child: Container(
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(5),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.grey, offset: Offset(2, 1), blurRadius: 5)
-                ]),
-            child: ListTile(
-              leading: Icon(
-                Icons.search,
-                color: Colors.purpleAccent[400],
-              ),
-              title: TextField(
-                decoration: InputDecoration(
-                    hintText: "Search study groups or people...",
-                    border: InputBorder.none),
-              ),
-            ),
-          ),
-        ),
-        preferredSize: Size(50, 100),
-      );
+      return searchBar();
     } else {
       return AppBar(
         automaticallyImplyLeading: false,
@@ -374,6 +388,11 @@ class _HomePageState extends State<HomePage> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.local_post_office, color: Colors.white),
+            onPressed: () {
+              Navigator.push(context, CupertinoPageRoute(builder: (context) {
+                return Messages();
+              }));
+            },
           )
         ],
       );
@@ -463,7 +482,7 @@ class _HomePageState extends State<HomePage> {
               case 1:
                 _data = "Home";
                 _screen = 1;
-                _profileSelected=false;
+                _profileSelected = false;
                 _showAppbar = true;
                 _searchSelected = false;
                 isScrollingDown = false;
@@ -471,20 +490,20 @@ class _HomePageState extends State<HomePage> {
               case 2:
                 _data = "Create Study Group";
                 _screen = 2;
-                _profileSelected=false;
+                _profileSelected = false;
                 _showAppbar = true;
                 _searchSelected = false;
                 isScrollingDown = false;
                 break;
               case 3:
                 _screen = 3;
-                _profileSelected=false;
+                _profileSelected = false;
                 _searchSelected = true;
                 _showAppbar = true;
                 isScrollingDown = false;
                 break;
               case 4:
-                _profileSelected=true;
+                _profileSelected = true;
                 _scaffoldkey.currentState.openEndDrawer();
                 break;
             }
@@ -494,15 +513,60 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget searchBar() {
+    return PreferredSize(
+      preferredSize: Size(0, 100),
+      child: Column(
+        children: <Widget>[
+          SizedBox(
+            height: 20,
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
+            child: Material(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+                side: BorderSide(
+                  color: Colors.black12,
+                ),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: ListTile(
+                  leading: Icon(
+                    Icons.search,
+                    color: secondPurple,
+                    size: 32,
+                  ),
+                  title: TextField(
+                    decoration: InputDecoration(
+                        hintText: "Search products", border: InputBorder.none),
+                  ),
+                  trailing: Icon(
+                    Icons.filter_list,
+                    color: secondPurple,
+                    size: 32,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    //SystemChrome.setEnabledSystemUIOverlays([]);
-
     return Scaffold(
       key: _scaffoldkey,
       resizeToAvoidBottomPadding: false,
       appBar: _showAppbar
-          ? _AppBar()
+          ? _appBar()
           : PreferredSize(
               child: Container(),
               preferredSize: Size(0.0, 0.0),
@@ -535,7 +599,6 @@ class _HomePageState extends State<HomePage> {
                           Colors.purple[700]
                         ])),
                     child: InkWell(
-                      splashColor: Colors.grey,
                       child: ListTile(
                         title: Row(
                           children: <Widget>[
@@ -626,8 +689,8 @@ class _HomePageState extends State<HomePage> {
 class Post {
   final String name;
   final String image;
-  final String type;
-  final List<String> tags;
+  final Tags type;
+  final List<Tags> tags;
   final String message;
 
   Post({this.name, this.image, this.type, this.tags, this.message});
