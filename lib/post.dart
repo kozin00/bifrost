@@ -35,6 +35,7 @@ class _PostState extends State<Post> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChannels.textInput.invokeMethod('TextInput.show');
     return Scaffold(
       appBar: AppBar(
         elevation: 0.1,
@@ -42,7 +43,9 @@ class _PostState extends State<Post> {
           icon: Icon(Icons.close),
           onPressed: () {
             selectedTagsList.clear();
+
             Navigator.pop(context);
+            SystemChannels.textInput.invokeMethod('TextInput.hide');
           },
         ),
         actions: <Widget>[
@@ -73,10 +76,7 @@ class _PostState extends State<Post> {
         selectType(),
         selectTags(),
         attachLink(),
-        Padding(
-          padding: const EdgeInsets.only(top: 15.0, left: 15.0, right: 15.0),
-          child: Divider(color: Colors.black54),
-        ),
+        Divider(color: Colors.black54),
         mainContent(),
         options(),
 
@@ -464,13 +464,10 @@ class _PostState extends State<Post> {
         });
   }
 
-  Padding mainContent() {
-    return Padding(
-      padding: const EdgeInsets.all(15.0),
-      child: TextField(
-        maxLines: 8,
-        decoration: InputDecoration(hintText: "Enter your text here"),
-      ),
+  TextField mainContent() {
+    return TextField(
+      maxLines: 10,
+      decoration: InputDecoration(hintText: "\t  Enter your text here"),
     );
   }
 
