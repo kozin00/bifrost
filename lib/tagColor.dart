@@ -8,7 +8,7 @@ Color primaryTagsColor(String field) {
       _tagColor = Colors.red[800];
       break;
     case "Study Group":
-      _tagColor = Colors.blue;
+      _tagColor = Colors.blue[700];
       break;
   }
 
