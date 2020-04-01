@@ -22,8 +22,6 @@ class _HomePageState extends State<HomePage> {
 
   String _data = "Home";
 
-  //Color active = Color(0xFFAF2BBF);
-
   Color iconColor = Colors.purple[700];
   Color secondPurple = Color(0xFFAF2BBF);
   ScrollController _scrollAppBarControllerHome = new ScrollController();
@@ -32,6 +30,8 @@ class _HomePageState extends State<HomePage> {
   ScrollController _scrollAppBarControllerFavourites = new ScrollController();
 
   int _screen = 1;
+
+  GlobalKey<FormState> _formkey = new GlobalKey<FormState>();
 
   GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey();
   List<Color> tagColors = [
@@ -43,9 +43,22 @@ class _HomePageState extends State<HomePage> {
     Colors.pink
   ];
 
+  String field;
+  List<String> fields = [
+    "Mathematics",
+    "Engineering",
+    "Science",
+    "Business & MGMT",
+    "HASS",
+    "Architecture",
+    "Custom"
+  ];
+
+
   @override
   void initState() {
     super.initState();
+
     myScroll();
   }
 
@@ -164,7 +177,7 @@ class _HomePageState extends State<HomePage> {
           Tags("Engineering", "Chemical Engineering"),
           Tags(
             "Engineering",
-            "Mechanincal Engineering",
+            "Mech. Engineering",
           ),
           Tags(
             "Science",
@@ -192,8 +205,11 @@ class _HomePageState extends State<HomePage> {
     Post(
         name: "Jon Jonzz",
         type: Tags("", "Mentor"),
-        message: " Duis aute irure dolor in reprehenderit in voluptate velit "
-            "esse cillum dolore eu fugiat nulla pariatur. ",
+        message: "Ut enim ad minima veniam, quis nostrum exercitationem "
+            "ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? "
+            "Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil"
+            " molestiae consequatur,"
+            " vel illum qui dolorem eum fugiat quo voluptas nulla pariatur? ",
         tags: [
           Tags("Science", "Telepathy"),
           Tags(
@@ -205,8 +221,9 @@ class _HomePageState extends State<HomePage> {
     Post(
         name: "Shayera",
         type: Tags("", "Mentor"),
-        message: " Duis aute irure dolor in reprehenderit in voluptate velit "
-            "esse cillum dolore eu fugiat nulla pariatur. ",
+        message: "  Nemo enim ipsam voluptatem quia voluptas"
+            " sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores "
+            "eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui ",
         tags: [
           Tags("Engineering", "Aerodynamics"),
           Tags("Science", "Biology")
@@ -253,75 +270,99 @@ class _HomePageState extends State<HomePage> {
         itemBuilder: (_, index) {
           return Padding(
             padding: const EdgeInsets.only(top: 8.0, left: 12.0, right: 20.0),
-            child: InkWell(
-              onTap: () {
-                Navigator.push(context, CupertinoPageRoute(builder: (context) {
-                  return PostDetails(
-                    name: posts[index].name,
-                    image: posts[index].image,
-                    post: posts[index].message,
-                    tags: posts[index].tags,
-                    type: posts[index].type,
-                  );
-                }));
-              },
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          child: Row(
-                            children: <Widget>[
-                              CircleAvatar(
-                                backgroundColor: Colors.purple,
-                              ),
-                              SizedBox(
-                                width: 20,
-                              ),
-                              Text(
-                                posts[index].name,
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(
-                                width: 50,
-                              ),
-                              Text(
-                                "2d",
-                                textAlign: TextAlign.right,
-                              )
-                            ],
-                          ),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        child: Row(
+                          children: <Widget>[
+                            CircleAvatar(
+                              backgroundColor: Colors.purple,
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            SizedBox(
+                                width: 290,
+                                child: Column(
+                                  children: <Widget>[
+                                    Align(
+                                      alignment: Alignment.topLeft,
+                                      child: Text(
+                                        posts[index].name,
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: "Gotu"),
+                                      ),
+                                    ),
+                                    Align(
+                                        alignment: Alignment.topLeft,
+                                        child: Text(
+                                          "2h",
+                                          textAlign: TextAlign.left,
+                                        ))
+                                  ],
+                                )),
+                            IconButton(
+                              onPressed: () {},
+                              color: Colors.grey,
+                              icon: Icon(Icons.more_vert),
+                            )
+                          ],
                         ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Container(
-                            height: 40,
-                            child: _buildTags(
-                                posts[index].type, posts[index].tags)),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Container(
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                          height: 40,
+                          child:
+                              _buildTags(posts[index].type, posts[index].tags)),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      InkWell(
+                        onTap: () {
+                          return Navigator.push(context,
+                              CupertinoPageRoute(builder: (context) {
+                            return PostDetails(
+                              name: posts[index].name,
+                              image: posts[index].image,
+                              post: posts[index].message,
+                              tags: posts[index].tags,
+                              type: posts[index].type,
+                            );
+                          }));
+                        },
+                        child: Container(
                           width: 400,
-                          child: Text(
-                            posts[index].message,
-                            textAlign: TextAlign.left,
-                            style: TextStyle(fontSize: 17.0),
-                          ),
+                          child: Text(posts[index].message,
+                              style: TextStyle(
+                                fontSize: 17.0,
+                                fontFamily: "Baloo_Thambi_2",
+                              ),
+                              textAlign: TextAlign.start),
                         ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Row(
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2, left: 10.0),
+                        child: Row(
                           children: <Widget>[
                             Row(
                               children: <Widget>[
-                                Icon(
-                                  Icons.comment,
-                                  color: Colors.grey,
+                                IconButton(
+                                  onPressed: () {},
+                                  icon: Icon(
+                                    Icons.comment,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(left: 5.0),
@@ -334,9 +375,12 @@ class _HomePageState extends State<HomePage> {
                             ),
                             Row(
                               children: <Widget>[
-                                Icon(
-                                  Icons.favorite,
-                                  color: Colors.red,
+                                IconButton(
+                                  onPressed: () {},
+                                  icon: Icon(
+                                    Icons.favorite,
+                                    color: Colors.red,
+                                  ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(left: 5.0),
@@ -345,15 +389,15 @@ class _HomePageState extends State<HomePage> {
                               ],
                             ),
                           ],
-                        )
-                      ],
-                    ),
+                        ),
+                      )
+                    ],
                   ),
-                  Divider(
-                    color: Colors.black38,
-                  )
-                ],
-              ),
+                ),
+                Divider(
+                  color: Colors.black38,
+                )
+              ],
             ),
           );
         });
@@ -405,11 +449,108 @@ class _HomePageState extends State<HomePage> {
         return _buildPost(posts);
         break;
       case 2:
+        return createGroup();
         break;
       case 3:
         break;
     }
     return null;
+  }
+
+  Widget createGroup() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 250, left: 80.0),
+      child: Container(
+        color:    Color(0xFFFCFCFC),
+        child: Form(
+          key: _formkey,
+          child: Column(
+            children: <Widget>[
+              Material(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 85.0),
+                  child: TextFormField(
+                      style: new TextStyle(
+                          fontSize: 20.0, height: 1.0, color: Colors.black),
+                      decoration: InputDecoration(
+                          border: new UnderlineInputBorder(
+
+                              borderSide: new BorderSide(
+                                  color: Colors.white,
+                                  style: BorderStyle.solid)),
+                          hintText: "Course name", ),
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "This field cannot be empty";
+                        } else if (value.length > 15) {
+                          return "Course name cannot be more than 15 characters";
+                        }
+                        return null;
+                      }),
+                ),
+              ),
+              Row(
+                children: <Widget>[
+                  Text(
+                    'School:',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  SizedBox(
+                    width: 20.0,
+                  ),
+                  DropdownButton<String>(
+                      value: field,
+                      icon: Icon(Icons.arrow_drop_down),
+                      iconSize: 24,
+                      elevation: 16,
+                      style: TextStyle(color: Colors.black),
+                      onChanged: (String value) {
+                        setState(() {
+                          field = value;
+                        });
+                      },
+                      items: fields.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(value, style: TextStyle(fontSize: 20)),
+                          ),
+                        );
+                      }).toList())
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0.0, 10.0, 90.0, 15.0),
+                child: Material(
+                  color: Color(0xFFAF2BBF),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  child: MaterialButton(
+                    onPressed: () {
+                    validate();
+                    },
+                    child: Text(
+                      "Create Group",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontFamily: "Gotu",
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  void validate(){
+  if(_formkey.currentState.validate()){
+
+  }
   }
 
   Widget navigationBar() {
@@ -488,6 +629,7 @@ class _HomePageState extends State<HomePage> {
                 isScrollingDown = false;
                 break;
               case 2:
+                field = fields[0];
                 _data = "Create Study Group";
                 _screen = 2;
                 _profileSelected = false;
@@ -544,7 +686,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   title: TextField(
                     decoration: InputDecoration(
-                        hintText: "Search products", border: InputBorder.none),
+                        hintText: "Search mentor/group", border: InputBorder.none),
                   ),
                   trailing: Icon(
                     Icons.filter_list,

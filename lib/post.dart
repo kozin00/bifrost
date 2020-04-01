@@ -515,3 +515,4 @@ class Groups {
 
   Groups({this.name, this.link});
 }
+
