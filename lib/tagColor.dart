@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+
 Color primaryTagsColor(String field) {
   Color _tagColor;
 
@@ -38,6 +39,27 @@ Color subTagsColor(String field) {
       break;
     default:
       _tagColor = Colors.grey;
+      break;
+  }
+
+  return _tagColor;
+}
+
+Color mentorTagsColor(String field) {
+  Color _tagColor;
+
+  switch (field) {
+    case "Bifrost":
+      _tagColor = Colors.blue[900];
+      break;
+    case "i-Persist":
+      _tagColor = Colors.red[800];
+      break;
+    case "RCOS":
+      _tagColor = Colors.yellow;
+      break;
+    default:
+      _tagColor = Colors.purple;
       break;
   }
 

@@ -1,6 +1,7 @@
 import 'package:bifrost/Tags.dart';
 import 'package:bifrost/messages.dart';
 import 'package:bifrost/postDetails.dart';
+import 'package:bifrost/profile.dart';
 import 'package:bifrost/tagColor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -288,15 +289,22 @@ class _HomePageState extends State<HomePage> {
                                 width: 290,
                                 child: Column(
                                   children: <Widget>[
-                                    Align(
-                                      alignment: Alignment.topLeft,
-                                      child: Text(
-                                        posts[index].name,
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: "Gotu"),
+                                    InkWell(
+                                      onTap:(){
+                                        Navigator.push(context, CupertinoPageRoute(builder: (context){
+                                          return Profile(name: posts[index].name);
+                                        }));
+                                      },
+                                      child: Align(
+                                        alignment: Alignment.topLeft,
+                                        child: Text(
+                                          posts[index].name,
+                                          textAlign: TextAlign.left,
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              fontFamily: "Gotu"),
+                                        ),
                                       ),
                                     ),
                                     Align(

@@ -1,3 +1,4 @@
+import 'package:bifrost/chatScreen.dart';
 import 'package:bifrost/postDetails.dart';
 import 'package:bifrost/tagColor.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,7 +24,7 @@ class _ProfileState extends State<Profile> {
   bool _favouriteIcon = false;
   Color mainTheme = Colors.purple;
   int count = 0;
-
+  List<String> mentorTags = ["Bifrost", "i-Persist", "RCOS", "CS1"];
   final profilePageList = List<ProfilePage>.from(details)..addAll(posts);
 
   @override
@@ -48,10 +49,10 @@ class _ProfileState extends State<Profile> {
     _scrollController.addListener(() {
       _isAppBarNotExpanded
           ? setState(() {
-              _home = "Uncle Sam's Health Foods";
+              _home = "";
             })
           : setState(() {
-              _home = "";
+              _home = widget.name;
             });
     });
 
@@ -99,7 +100,7 @@ class _ProfileState extends State<Profile> {
                       style: TextStyle(color: Colors.white),
                     )),
                     backgroundColor: mainTheme,
-                    expandedHeight: 330.0,
+                    expandedHeight: 370.0,
                     floating: false,
                     pinned: true,
                     flexibleSpace: FlexibleSpaceBar(
@@ -122,8 +123,44 @@ class _ProfileState extends State<Profile> {
                                       color: Colors.white,
                                       fontFamily: "Gotu"),
                                 ),
+                                Material(
+                                  clipBehavior: Clip.antiAlias,
+                                  color: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(40),
+                                      side: BorderSide(color: Colors.lightGreen[800])),
+                                  child: Container(
+                                    color: Colors.transparent,
+                                    width: 110,
+                                    height: 35,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        children: <Widget>[
+                                          CircleAvatar(
+                                            radius: 5,
+                                            backgroundColor: Colors.lightGreen[800],
+                                          ),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text(
+                                            "Available",
+
+                                            style: TextStyle(color: Colors.lightGreen[800], fontSize: 18),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
                                 IconButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.push(context,
+                                        CupertinoPageRoute(builder: (context) {
+                                      return Chat(name: widget.name);
+                                    }));
+                                  },
                                   icon: Icon(
                                     Icons.mail,
                                     color: Colors.white,
@@ -144,11 +181,12 @@ class _ProfileState extends State<Profile> {
   Widget mainBody() {
     return Column(
       children: <Widget>[
-        Container(
+        Flexible(
+            child: Container(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           child: buildPost(posts),
-        )
+        )),
       ],
     );
   }
@@ -160,11 +198,23 @@ class _ProfileState extends State<Profile> {
           print("count $index");
           final profilePageItem = profilePageList[index];
           if (profilePageItem is MentorDetails) {
-            return Container(
-             height: 0.0,
+            return Column(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10.0),
+                  child: Container(
+                    height: 35.0,
+                    color: Colors.white,
+                    child: _buildMentorTags(mentorTags),
+                  ),
+                ),
+                Divider(
+                  color: Colors.black12,
+                )
+              ],
             );
           } else {
-            index=index-1;
+            index = index - 1;
             return Padding(
               padding: const EdgeInsets.only(top: 8.0, left: 12.0, right: 20.0),
               child: Column(
@@ -331,6 +381,54 @@ class _ProfileState extends State<Profile> {
                 width: 15,
               )
             ],
+          );
+        });
+  }
+
+  Widget _buildMentorTags(List<String> tags) {
+    return ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: tags.length,
+        itemBuilder: (context, index) {
+          Color tagColor = mentorTagsColor(tags[index]);
+          return Padding(
+            padding: const EdgeInsets.only(left: 25.0),
+            child: Row(
+              children: <Widget>[
+                Material(
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(40),
+                      side: BorderSide(color: tagColor)),
+                  child: Container(
+                    color: Colors.white,
+                    width: 100,
+                    height: 35,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: <Widget>[
+                          CircleAvatar(
+                            radius: 5,
+                            backgroundColor: tagColor,
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            tags[index],
+                            style: TextStyle(color: tagColor),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 15,
+                )
+              ],
+            ),
           );
         });
   }
