@@ -6,4 +6,4 @@ For Android version:
   - Install Fluttter: https://flutter.dev/docs/get-started/install
   - Install an IDE (preferably Android Studio or Visual Studio Code
   - Download an Android emulator or connect directly to a mobile phone
-  - Run the program
+  - Build and Run
